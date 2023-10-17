@@ -19,7 +19,17 @@ const TodoList: React.FC = () => {
 
   useEffect(() => {
     if (data) {
-      setTodos(data.todos);
+      console.log("Fetched Todos:", data.todos);
+      
+      const uniqueTodos = data.todos.filter((todo, index, self) => 
+        index === self.findIndex(t => t.id === todo.id)
+      );
+
+      if (uniqueTodos.length !== data.todos.length) {
+        console.warn("Filtered out duplicate todos.");
+      }
+
+      setTodos(uniqueTodos);
     }
   }, [data]);
 
@@ -56,7 +66,7 @@ const TodoList: React.FC = () => {
       </div>
       <ul>
         {todos.map((todo) => (
-          <li key={`${todo.id}-${todo.description}`} className="mb-2 p-2 border rounded-md flex justify-between items-center">
+          <li key={todo.id} className="mb-2 p-2 border rounded-md flex justify-between items-center">
             {todo.description}
             <button 
               onClick={() => handleDeleteTodo(todo.id)}
