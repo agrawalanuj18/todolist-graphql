@@ -1,12 +1,6 @@
-// src/state.ts
 import { atom } from 'recoil';
 
-interface Todo {
-  id: number;
-  description: string;
-}
-
-export const todoListState = atom<Todo[]>({
+export const todoListState = atom({
   key: 'todoListState',
   default: [],
 });

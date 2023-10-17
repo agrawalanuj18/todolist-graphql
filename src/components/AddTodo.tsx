@@ -1,38 +1,35 @@
 // src/components/AddTodo.tsx
 import React, { useState } from 'react';
 import '../index.css';
-
-interface Props {
-  addTodo: (description: string) => void;
+interface AddTodoProps {
+  onAdd: (text: string) => void;
 }
 
-const AddTodo: React.FC<Props> = ({ addTodo }) => {
-  const [description, setdescription] = useState('');
+const AddTodo: React.FC<AddTodoProps> = ({ onAdd }) => {
+  const [text, setText] = useState('');
 
-  // Inside AddTodo component
-const handleSubmit = () => {
-    if (description.trim()) {
-      addTodo(description.trim());
-      setdescription('');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (text) {
+      onAdd(text);
+      setText('');
     }
   };
-  
 
- // src/components/AddTodo.tsx
-return (
-    <div className="flex space-x-4">
-      <input
-        type="description"
-        value={description}
-        onChange={(e) => setdescription(e.target.value)}
-        className="flex-grow border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Add a new task..."
+  return (
+    <form onSubmit={handleSubmit} className="flex items-center space-x-4">
+      <input 
+        type="text" 
+        value={text} 
+        onChange={e => setText(e.target.value)}
+        placeholder="Add a todo..."
+        className="p-2 border rounded w-full"
       />
-      <button onClick={handleSubmit} className="bg-blue-500 description-white p-2 rounded hover:bg-blue-600 transition">
+      <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
         Add
       </button>
-    </div>
-  );  
-};
+    </form>
+  );
+}
 
 export default AddTodo;
