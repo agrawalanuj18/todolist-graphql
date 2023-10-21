@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import { useRecoilState } from 'recoil';
 import { todoListState } from './state';
 
@@ -12,10 +12,20 @@ const GET_TODOS = gql`
   }
 `;
 
+const UPDATE_TODO = gql`
+  mutation updateTodo($input: UpdateTodoInput!) {
+    updateTodo(input: $input) {
+      id
+      description
+    }
+  }
+`;
+
 const TodoList: React.FC = () => {
   const { loading, error, data } = useQuery(GET_TODOS);
   const [todos, setTodos] = useRecoilState(todoListState);
   const [inputValue, setInputValue] = useState<string>('');
+  const [updateTodoMutation] = useMutation(UPDATE_TODO);
 
   useEffect(() => {
     if (data) {
@@ -33,10 +43,21 @@ const TodoList: React.FC = () => {
     }
   }, [data]);
 
-  const handleAddTodo = () => {
+  const handleUpdateTodo = () => {
     if (inputValue.trim()) {
-      setTodos((oldTodos) => [...oldTodos, { id: Date.now().toString(), description: inputValue }]);
-      setInputValue('');
+      updateTodoMutation({
+        variables: {
+          input: {
+            description: inputValue
+          }
+        }
+      }).then(response => {
+        const newTodo = response.data.updateTodo;
+        setTodos(oldTodos => [...oldTodos, newTodo]);
+        setInputValue('');
+      }).catch(error => {
+        console.error("Error adding todo:", error);
+      });
     }
   };
 
@@ -58,7 +79,7 @@ const TodoList: React.FC = () => {
           onChange={(e) => setInputValue(e.target.value)}
         />
         <button 
-          onClick={handleAddTodo}
+          onClick={handleUpdateTodo}
           className="w-full mt-2 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
         >
           Add Todo
